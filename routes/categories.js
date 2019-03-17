@@ -2,11 +2,18 @@ var express = require('express');
 var router = express.Router();
 const CategoryModel = require('../db/models/CategoryModel');
 const ApiResponse = require('../lib/ApiResponse');
-
+const limit = 10;
 /* GET Category listing. */
 router.get('/getall', async (req, res) => {
     try {
-        let result = await CategoryModel.getAll();
+        let page = req.query.page || 1;
+        const offset = (parseInt(page) - 1) * limit;
+
+        let where = [];
+        if (typeof req.query.name !== 'undefined' && req.query.name !== '') {
+            where.push(` name like '%${req.query.name}%' `);
+        }
+        let result = await CategoryModel.getAll(where.join('and'), limit, offset);
         ApiResponse.ok(res, result);
     } catch (ex) {
         ApiResponse.error(res, ex);
@@ -33,11 +40,11 @@ router.post('/save', async (req, res) => {
         if (typeof req.body.id === 'undefined') {
             let result = await CategoryModel.save(req.body);
             ApiResponse.ok(res, result);
-        }else{
+        } else {
             let result = await CategoryModel.update(req.body);
             ApiResponse.ok(res, result);
-        }    
-        
+        }
+
     } catch (ex) {
         ApiResponse.error(res, ex);
     }
