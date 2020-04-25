@@ -15,8 +15,9 @@ module.exports = (app) => {
   app.use('/api/client', clients);
   app.use('/api/user', users);
   app.use('/api/category', categories);
-  app.use('/api/storeProducts', storeProducts);
+  app.use('/api/storeproducts', storeProducts);
   app.use('/api/orders', orders);
+  app.use('/api/stores', stores);
   app.use('/api/payments', payments);
 };
 

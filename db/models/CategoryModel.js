@@ -1,20 +1,27 @@
 const db = require('../index');
 const table_name = 'tpCategories';
+require('dotenv').config();
 
 class CategoryModel {
   constructor() {
 
   }
 
-  static getAll(where = '1=1', limit, offset) {
+  static getAll(where, orderBy, limit, offset) {
     return new Promise((resolve, reject) => {
 
-      let query = `SELECT * FROM ${table_name} where${where}LIMIT ${limit} OFFSET ${offset}`; 
+      let query = `SELECT * FROM ${table_name} where${where}${orderBy}`; 
+      if(limit != ''){
+        query +=  ` LIMIT ${limit}`;
+      }
+      if(offset != ''){
+        query +=  ` OFFSET ${offset}`;
+      }
       db.query(query, (err, res) => {
         if (err) {
           reject(err);
         } else {
-          db.query(`Select count(*) as totalCount from ${table_name} `, (countQueryerr, countQueryres) => {
+          db.query(`Select count(*) as totalCount from ${table_name} where${where}`, (countQueryerr, countQueryres) => {
             if (countQueryerr) {
               reject(countQueryerr);
             } else {

@@ -6,13 +6,30 @@ class ClientModel {
 
   }
 
-  static getAll() {
+  static getAll(where, orderBy, limit, offset) {
     return new Promise((resolve, reject) => {
-      db.query(`SELECT * FROM  ${table_name} `, (err, res) => {
+      let query = `SELECT * FROM ${table_name} where${where}${orderBy}`; 
+      if(limit != ''){
+        query +=  ` LIMIT ${limit}`;
+      }
+      if(offset != ''){
+        query +=  ` OFFSET ${offset}`;
+      }
+      db.query(query, (err, res) => {
         if (err) {
           reject(err);
         } else {
-          resolve(res);
+          db.query(`Select count(*) as totalCount from ${table_name} where${where}`, (countQueryerr, countQueryres) => {
+            if (countQueryerr) {
+              reject(countQueryerr);
+            } else {
+              let data = {
+                'data': res,
+                'total': countQueryres[0].totalCount
+              };
+              resolve(data);
+            }
+          });
         }
       });
     });
